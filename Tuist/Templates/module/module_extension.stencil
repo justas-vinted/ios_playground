@@ -1,0 +1,9 @@
+import Foundation
+
+public extension Module {
+    @objc
+    static let {{ name }}: Module = {
+        let module = Module(name: "{{ name }}")        
+        return module
+    }()
+}
