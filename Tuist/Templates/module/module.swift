@@ -10,7 +10,7 @@ let moduleTemplate = Template(
     items: [
         .file(path: "\(nameAttribute)/Contract/File.swift", templatePath: "placeholder.stencil"),
         .file(path: "\(nameAttribute)/Implementation/File.swift", templatePath: "placeholder.stencil"),
-        .file(path: "\(nameAttribute)/Mocks/File.swift", templatePath: "mocks.stencil"),
+        .file(path: "\(nameAttribute)/Mocks/File.swift", templatePath: "placeholder.stencil"),
         .file(path: "\(nameAttribute)/UnitTests/Tests.swift", templatePath: "placeholder.stencil"),
         .file(path: "\(nameAttribute)/SnapshotTests/Tests.swift", templatePath: "placeholder.stencil"),
         .file(path: "\(nameAttribute)/IntegrationTests/Tests.swift", templatePath: "placeholder.stencil"),
