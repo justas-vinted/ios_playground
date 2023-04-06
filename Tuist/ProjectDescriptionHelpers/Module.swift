@@ -13,10 +13,12 @@ public final class Module: NSObject {
     public var snapshotTests: Target?
     public var demoApp: Target?
     public var packages: [Package]
+    public var autogenerateSchemes = true
+    public var schemes: [Scheme]
 
-    public init(name: String, packages: [Package] = []) {
+    public init(name: String, packages: [Package] = [], schemes: [Scheme] = []) {
         self.name = name
-
+        self.schemes = []
         self.contract = Target(
             name: "\(name)Contract",
             targetPath: .relativeToProjectPath(path: "Contract"),
@@ -75,7 +77,7 @@ extension Module {
             ].compactMap {
                 $0
             },
-            schemes: [implementationScheme],
+            schemes: schemes + generateSchemes(),
             packages: packages
         )
         .build()
@@ -96,30 +98,52 @@ extension Module {
         snapshotTests?.dependencies += [.package(product: "SnapshotTesting")]
     }
 
-    private var implementationScheme: Scheme {
+    private func generateSchemes() -> [Scheme] {
+        var schemes: [Scheme] = []
+        guard autogenerateSchemes else {
+            return schemes
+        }
+        
+        if let implementation = implementation {
+            schemes += [
+                scheme(
+                    name: implementation.name,
+                    buildTargets: [implementation, contract].compactMap {$0},
+                    testsTargets:  [unitTests].compactMap {$0},
+                    codeCoverageTargets: [implementation, contract].compactMap {$0}
+                )
+            ]
+        }
+        
+        if let demoApp = demoApp {
+            schemes += [
+                scheme(
+                    name: demoApp.name,
+                    buildTargets: [demoApp, implementation, contract].compactMap {$0},
+                    testsTargets:  [unitTests].compactMap {$0},
+                    codeCoverageTargets: [implementation, contract].compactMap {$0}
+                )
+            ]
+        }
+        
+        return schemes
+    }
+    
+    private func scheme(
+        name: String,
+        buildTargets: [ProjectBuilder.ModuleTarget],
+        testsTargets: [ProjectBuilder.ModuleTarget],
+        codeCoverageTargets: [ProjectBuilder.ModuleTarget]
+    ) -> Scheme {
         Scheme(
             name: name,
             buildAction: .init(
-                targets: [
-                    contract,
-                    implementation,
-                    unitTests,
-                    snapshotTests,
-                    integrationTests,
-                    demoApp
-                ]
-                .compactMap { $0 }
-                .map {
+                targets: buildTargets.map {
                     .init(projectPath: nil, target: $0.name)
                 }
             ),
             testAction: .targets(
-                [
-                    unitTests,
-                    integrationTests,
-                    snapshotTests
-                ]
-                .compactMap { $0 }
+                testsTargets
                 .map { target in
                     .init(
                         target: .init(
@@ -131,11 +155,7 @@ extension Module {
                 arguments: .init(),
                 options: .options(
                     coverage: true,
-                    codeCoverageTargets: [
-                        contract, implementation
-                    ]
-                    .compactMap { $0 }
-                    .map {
+                    codeCoverageTargets: codeCoverageTargets.map {
                         .init(
                             projectPath: nil,
                             target: $0.name

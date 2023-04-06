@@ -16,6 +16,6 @@ let moduleTemplate = Template(
         .file(path: "\(nameAttribute)/IntegrationTests/Tests.swift", templatePath: "placeholder.stencil"),
         .file(path: "\(nameAttribute)/Demo/AppDelegate.swift", templatePath: "app_delegate.stencil"),
         .file(path: "\(nameAttribute)/Project.swift", templatePath: "project.stencil"),
-        .file(path: "Tuist/ProjectDescriptionHelpers/Modules/Module+\(nameAttribute).swift", templatePath: "module_extension.stencil")
+        .file(path: "Tuist/ProjectDescriptionHelpers/Modules/\(nameAttribute)/Module+\(nameAttribute).swift", templatePath: "module_extension.stencil")
     ]
 )

@@ -39,7 +39,7 @@ public final class ProjectBuilder {
             "/**/*.swift"
         ].map(Resource.relativeToTarget(path:))
 
-        public let name: String
+        public var name: String
         public let targetPath: TargetPath
         public var dependencies: [TargetDependency]
         public var product: Product
